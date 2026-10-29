@@ -12,7 +12,7 @@ from .models import DOCUMENT_TYPES, UARB_URL, FetchResult
 from .packager import Package
 from .request_parser import DocumentRequest
 
-SIGNATURE = "Best regards,\nUARB Regulatory Agent"
+SIGNATURE = "Best regards,\nSenpilot Agent"
 
 _SINGULAR = {
     "Exhibits": "Exhibit",

@@ -1,4 +1,4 @@
-# UARB Regulatory Agent
+# Senpilot Agent
 
 **This agent is deployed on Google Cloud. To try it, just email
 savioSenpilot@gmail.com**, for example: *"Hi Agent, Can you give me Other

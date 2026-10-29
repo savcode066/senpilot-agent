@@ -33,7 +33,7 @@ class Settings:
     spam_folder: str = "[Gmail]/Spam"
     smtp_host: str = ""
     smtp_port: int = 465
-    agent_name: str = "UARB Regulatory Agent"
+    agent_name: str = "Senpilot Agent"
     poll_interval: int = 30
     # Only these senders (addresses or @domains) get a reply. Empty = anyone.
     allowed_senders: tuple[str, ...] = field(default_factory=tuple)
@@ -58,7 +58,7 @@ class Settings:
             spam_folder=os.getenv("SPAM_FOLDER", "[Gmail]/Spam"),
             smtp_host=os.getenv("SMTP_HOST", ""),
             smtp_port=int(os.getenv("SMTP_PORT", "465")),
-            agent_name=os.getenv("AGENT_NAME", "UARB Regulatory Agent"),
+            agent_name=os.getenv("AGENT_NAME", "Senpilot Agent"),
             poll_interval=int(os.getenv("POLL_INTERVAL_SECONDS", "30")),
             allowed_senders=_env_list("ALLOWED_SENDERS"),
             max_documents=int(os.getenv("MAX_DOCUMENTS", "10")),

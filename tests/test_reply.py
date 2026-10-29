@@ -58,7 +58,7 @@ def test_matches_challenge_example():
     body = compose_reply(result, package, "Sam")
     assert body.startswith("Hi Sam,\n\n")
     assert "Letter 0" not in body
-    assert body.endswith("as a ZIP here.\n\nBest regards,\nUARB Regulatory Agent\n")
+    assert body.endswith("as a ZIP here.\n\nBest regards,\nSenpilot Agent\n")
 
 
 def test_catch_all_category_is_named():
