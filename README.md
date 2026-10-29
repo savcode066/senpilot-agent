@@ -3,7 +3,8 @@
 **This agent is deployed on Google Cloud. To try it, just email
 savioSenpilot@gmail.com**, for example: *"Hi Agent, Can you give me Other
 Documents files from M12205? Thanks!"* A reply with a ZIP of the documents
-arrives within a few minutes.
+arrives within a few minutes. It only replies to emails sent from an
+**@senpilot.com** address.
 
 ## How it works
 
