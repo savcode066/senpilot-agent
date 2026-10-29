@@ -119,6 +119,8 @@ def describe_download(
     else:
         what = f"{attached} out of the {available} {doc_type}"
     sentence = f"I downloaded {what} and am attaching {it_them} as a ZIP here."
+    if result.email_full:
+        sentence += " That's as many as fit in one email."
 
     notes = []
     if too_large:

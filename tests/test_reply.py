@@ -104,6 +104,16 @@ def test_failures_and_size_limit_are_reported():
     )
 
 
+def test_email_full():
+    result = example_result(docs=7)
+    result.email_full = True
+    package = Package(Path("x.zip"), included=result.documents)
+    assert describe_download(result, package, size_limit_mb=18) == (
+        "I downloaded 7 out of the 21 Other Documents and am attaching them as a ZIP here. "
+        "That's as many as fit in one email."
+    )
+
+
 def test_everything_too_large():
     result = example_result(docs=0)
     result.document_type = "Recordings"

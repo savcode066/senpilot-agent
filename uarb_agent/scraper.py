@@ -24,9 +24,12 @@ log = logging.getLogger(__name__)
 
 # Stop trying further rows after this many failed downloads in one request.
 _MAX_FAILURES = 5
-# If this many files in a row are over the size budget and none has fit yet,
+# If this many files in a row are over the size limit and none has fit yet,
 # assume the tab is all large media (hearing recordings run ~150 MB) and stop.
 _MAX_OVERSIZED_BEFORE_GIVING_UP = 3
+# Oversized files don't use up a document slot, but each costs a partial
+# download, so stop looking after this many.
+_MAX_OVERSIZED = 10
 
 _TAB_RE = re.compile(r"^(%s)\s*-\s*(\d+)$" % "|".join(re.escape(t) for t in DOCUMENT_TYPES))
 _DATE_RE = re.compile(r"^\d{1,2}/\d{1,2}/\d{4}$")
@@ -348,10 +351,12 @@ class UARBScraper:
         listed: int,
         max_bytes: int | None,
     ) -> None:
-        """Work down the list until `wanted` documents are handled or it runs out.
+        """Work down the list until `wanted` documents are downloaded or it runs out.
 
-        A document is handled once it is downloaded or found too large for the
-        size budget. A row that errors doesn't count; the next row replaces it.
+        A document over `max_bytes` on its own is skipped and reported in
+        `result.too_large`; it doesn't use up a slot. Once the next document
+        would push the total past `max_bytes`, the email is full and this stops.
+        A row that errors is retried once, then the next row replaces it.
         """
         page = self.page
         rows = page.locator("tr.v-grid-row-has-data")
@@ -359,12 +364,15 @@ class UARBScraper:
         attempts: dict[str, int] = {}
         used_bytes = 0
         stalled_scrolls = 0
-        while len(result.documents) + len(result.too_large) < wanted and len(seen) < listed:
+        while len(result.documents) < wanted and len(seen) < listed:
             if len(result.failures) >= _MAX_FAILURES:
                 log.warning("Giving up after %d failed downloads", len(result.failures))
                 break
             if not result.documents and len(result.too_large) >= _MAX_OVERSIZED_BEFORE_GIVING_UP:
                 log.warning("The first %d documents are all too large; stopping", len(result.too_large))
+                break
+            if len(result.too_large) >= _MAX_OVERSIZED:
+                log.warning("Stopping after %d documents too large to email", len(result.too_large))
                 break
             visible = self._visible_rows()
             pending = [r for r in visible if r["key"] not in seen]
@@ -384,13 +392,11 @@ class UARBScraper:
             key = row["key"]
             attempts[key] = attempts.get(key, 0) + 1
             label = " - ".join(p for p in (row["doc_no"], row["title"]) if p) or row["date"]
-            done = len(result.documents) + len(result.too_large)
-            log.info("Downloading %d/%d: %s", done + 1, wanted, label)
-            budget = None if max_bytes is None else max_bytes - used_bytes
+            log.info("Downloading %d/%d: %s", len(result.documents) + 1, wanted, label)
             neighbours = {r["doc_no"] for r in visible if r["doc_no"] and r["key"] != key}
             try:
                 files = self._go_get_it(
-                    rows.nth(row["index"]), dest_dir, budget, row["doc_no"], neighbours
+                    rows.nth(row["index"]), dest_dir, max_bytes, row["doc_no"], neighbours
                 )
             except FileTooLargeError as exc:
                 log.info("Skipping %s: %s", label, exc)
@@ -414,6 +420,12 @@ class UARBScraper:
             doc = DownloadedDocument(
                 doc_no=row["doc_no"], title=row["title"], date=row["date"], files=files
             )
+            if max_bytes is not None and used_bytes + doc.size_bytes > max_bytes:
+                log.info("The email is full; %s doesn't fit", label)
+                for f in files:
+                    f.unlink(missing_ok=True)
+                result.email_full = True
+                break
             used_bytes += doc.size_bytes
             result.documents.append(doc)
 
@@ -497,7 +509,7 @@ class UARBScraper:
                         written += len(chunk)
                         if max_bytes is not None and written > max_bytes:
                             raise FileTooLargeError(
-                                f"{target.name} is over the {max(max_bytes, 0) / 2**20:.1f} MB left in the budget"
+                                f"{target.name} is over the {max(max_bytes, 0) / 2**20:.1f} MB size limit"
                             )
                         out.write(chunk)
         except BaseException:

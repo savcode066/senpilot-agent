@@ -72,6 +72,8 @@ class FetchResult:
     # Labels of documents that errored, and of ones too large to email.
     failures: list[str] = field(default_factory=list)
     too_large: list[str] = field(default_factory=list)
+    # Stopped early because the next document wouldn't fit in the email.
+    email_full: bool = False
 
     @property
     def available(self) -> int:
