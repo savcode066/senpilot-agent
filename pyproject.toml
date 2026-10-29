@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "uarb-agent"
+version = "0.1.0"
+description = "Email agent that fetches Nova Scotia UARB regulatory filings and replies with a ZIP"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "anthropic>=2.2",
+    "playwright>=1.50",
+    "pydantic>=2.0",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+uarb-agent = "uarb_agent.cli:main"
+
+[tool.setuptools]
+packages = ["uarb_agent"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

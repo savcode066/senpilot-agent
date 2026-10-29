@@ -1,0 +1,11 @@
+.env
+.env.*
+.venv/
+venv/
+output/
+*.zip
+**/__pycache__/
+*.egg-info/
+.pytest_cache/
+.git/
+ideas.txt
