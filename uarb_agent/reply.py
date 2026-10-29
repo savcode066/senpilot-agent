@@ -52,8 +52,7 @@ def describe_matter(result: FetchResult) -> str:
         sentences.append(f"{md.matter_number} is about {article}{md.title}.")
     else:
         sentences.append(f"Here's what I found for {md.matter_number}.")
-    # Some matters use a catch-all category ("Other"), which reads badly inline.
-    category = "" if md.category.lower() in {"other", "others", "miscellaneous"} else md.category
+    category = md.category
     if category and md.type:
         sentences.append(f"It relates to {category} within the {md.type} category.")
     elif category or md.type:

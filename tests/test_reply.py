@@ -61,11 +61,11 @@ def test_matches_challenge_example():
     assert body.endswith("as a ZIP here.\n\nBest regards,\nUARB Regulatory Agent\n")
 
 
-def test_catch_all_category_is_not_named():
+def test_catch_all_category_is_named():
     result = example_result()
     result.metadata.type = "Municipal Boundaries"
     result.metadata.category = "Other"
-    assert "It falls under the Municipal Boundaries category." in describe_matter(result)
+    assert "It relates to Other within the Municipal Boundaries category." in describe_matter(result)
 
 
 def test_all_documents_and_singular_wording():
