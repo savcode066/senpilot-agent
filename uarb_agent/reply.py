@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from datetime import date
 
-from .models import DOCUMENT_TYPES, FetchResult
+from .models import DOCUMENT_TYPES, UARB_URL, FetchResult
 from .packager import Package
 from .request_parser import DocumentRequest
 
@@ -103,11 +103,12 @@ def describe_download(
             )
             return (
                 f"Unfortunately I couldn't attach any {doc_type}: {tried} {too_big} "
-                f"({'; '.join(too_large)}), so there's no ZIP this time."
+                f"({'; '.join(too_large)}), so there's no ZIP this time. "
+                f"{_still_listed(result, len(too_large))}"
             )
         return (
             f"Unfortunately I couldn't download any of the {count_phrase(available, doc_type)} "
-            "from the site, so there's no ZIP this time. Please try again later."
+            f"from the UARB site ({UARB_URL}), so there's no ZIP this time. Please try again later."
         )
 
     it_them = "it" if attached == 1 else "them"
@@ -128,8 +129,15 @@ def describe_download(
             f"{len(result.failures)} couldn't be downloaded from the site ({'; '.join(result.failures)})"
         )
     if notes:
-        sentence += " Note: " + "; ".join(notes) + "."
+        left_out = len(too_large) + len(result.failures)
+        sentence += f" Note: {'; '.join(notes)}. {_still_listed(result, left_out)}"
     return sentence
+
+
+def _still_listed(result: FetchResult, n: int) -> str:
+    """Where documents left out of the email can still be found."""
+    it = "It's" if n == 1 else "They're"
+    return f"{it} still listed under {result.metadata.matter_number} at {UARB_URL}."
 
 
 def _label(doc_no: str, title: str, date_text: str) -> str:
@@ -173,8 +181,8 @@ def compose_clarification(request: DocumentRequest, name: str) -> str:
 def compose_not_found(matter_number: str, name: str) -> str:
     return (
         f"Hi {name},\n\n"
-        f"I searched the UARB public documents database for {matter_number} but no matter "
-        "with that number exists. Could you double-check the number and send it again?\n\n"
+        f"I searched the UARB public documents database ({UARB_URL}) for {matter_number}, "
+        "but no matter with that number exists. Could you double-check the number and send it again?\n\n"
         f"{SIGNATURE}\n"
     )
 
@@ -183,7 +191,7 @@ def compose_error(name: str, matter_number: str | None = None) -> str:
     about = f" while fetching {matter_number}" if matter_number else ""
     return (
         f"Hi {name},\n\n"
-        f"Sorry, I ran into a problem with the UARB website{about} and couldn't complete "
+        f"Sorry, I ran into a problem with the UARB website ({UARB_URL}){about} and couldn't complete "
         "your request. Please try again in a little while.\n\n"
         f"{SIGNATURE}\n"
     )

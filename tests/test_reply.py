@@ -99,7 +99,8 @@ def test_failures_and_size_limit_are_reported():
     assert describe_download(result, package, size_limit_mb=18) == (
         "I downloaded 2 out of the 21 Other Documents and am attaching them as a ZIP here. "
         "Note: 2 more were over the 18 MB email limit (100050 - Big Report; 100002 - Letter 2); "
-        "1 couldn't be downloaded from the site (100099 - Broken)."
+        "1 couldn't be downloaded from the site (100099 - Broken). "
+        "They're still listed under M12205 at https://uarb.novascotia.ca/fmi/webd/UARB15."
     )
 
 
@@ -110,7 +111,8 @@ def test_everything_too_large():
     result.too_large = ["Monday", "Monday Evening Session", "Tuesday"]
     assert describe_download(result, Package(None), size_limit_mb=18) == (
         "Unfortunately I couldn't attach any Recordings: the first 3 I tried are each over the "
-        "18 MB email limit (Monday; Monday Evening Session; Tuesday), so there's no ZIP this time."
+        "18 MB email limit (Monday; Monday Evening Session; Tuesday), so there's no ZIP this time. "
+        "They're still listed under M12205 at https://uarb.novascotia.ca/fmi/webd/UARB15."
     )
 
 

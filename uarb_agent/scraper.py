@@ -18,11 +18,9 @@ from playwright.sync_api import Browser, Locator, Page, Playwright, sync_playwri
 from playwright.sync_api import Error as PlaywrightError
 from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
-from .models import DOCUMENT_TYPES, DownloadedDocument, FetchResult, MatterMetadata
+from .models import DOCUMENT_TYPES, UARB_URL, DownloadedDocument, FetchResult, MatterMetadata
 
 log = logging.getLogger(__name__)
-
-UARB_URL = "https://uarb.novascotia.ca/fmi/webd/UARB15"
 
 # Stop trying further rows after this many failed downloads in one request.
 _MAX_FAILURES = 5

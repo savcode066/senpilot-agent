@@ -6,6 +6,8 @@ from dataclasses import dataclass, field
 from datetime import date, datetime
 from pathlib import Path
 
+UARB_URL = "https://uarb.novascotia.ca/fmi/webd/UARB15"
+
 DOCUMENT_TYPES: tuple[str, ...] = (
     "Exhibits",
     "Key Documents",
